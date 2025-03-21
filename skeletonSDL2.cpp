@@ -24,13 +24,16 @@ SDL2Aux *sdlAux;
 
 vec3 topLeft(1, 0, 0);     // red
 vec3 topRight(0, 0, 1);    // blue
-vec3 bottomLeft(0, 1, 0);  // green
-vec3 bottomRight(1, 1, 0); // yellow
+vec3 bottomLeft(1, 1, 0);  // green
+vec3 bottomRight(0, 1, 0); // yellow
 
 // Starfield
 vector<vec3> stars(1000);
+vector<vec3> endStars(1000);
 
 int t;
+int trailLengthNow = 0;
+const int trailLengthMax = 100;
 
 // ---------------------------------------------------------
 // FUNCTION DECLARATIONS
@@ -40,6 +43,8 @@ void interpolate(vec3 a, vec3 b, vector<vec3> &result);
 void interpolate_test_1();
 void interpolate_test_2();
 void update();
+void task2();
+void task3();
 // ---------------------------------------------------------
 
 // FUNCTION DEFINITIONS
@@ -52,6 +57,8 @@ int main(int argc, char *argv[])
     stars[i].y = float(rand()) / float(RAND_MAX) * 2.0f - 1.0f;
     stars[i].z = float(rand()) / float(RAND_MAX);
   }
+  // copy stars to endStars
+  endStars = stars;
 
   sdlAux = new SDL2Aux(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -79,43 +86,22 @@ int main(int argc, char *argv[])
 
 void draw()
 {
-  sdlAux->clearPixels();
+  // sdlAux->clearPixels();
 
   // Lab1 task2
 
-  // vector<vec3> left_side(SCREEN_HEIGHT);
-  // vector<vec3> right_side(SCREEN_HEIGHT);
-  // interpolate(topLeft, bottomLeft, left_side);
-  // interpolate(topRight, bottomRight, right_side);
-
-  // for (int y = 0; y < SCREEN_HEIGHT; ++y)
-  // {
-  //   vector<vec3> row(SCREEN_WIDTH);
-  //   interpolate(left_side[y], right_side[y], row);
-  //   for (int x = 0; x < SCREEN_WIDTH; ++x)
-  //   {
-  //     sdlAux->putPixel(x, y, row[x]);
-  //   }
-  // }
+  // task2();
 
   // Lab1 task3
 
-  float f = SCREEN_HEIGHT / 2;
-
-  for (size_t i = 0; i < stars.size(); i++)
-  {
-    // calculate u for this star from f
-    float u = f * stars[i].x / stars[i].z + SCREEN_WIDTH / 2;
-    // calculate v for this star from f
-    float v = f * stars[i].y / stars[i].z + SCREEN_HEIGHT / 2;
-    vec3 color = 0.2f * vec3(1,1,1) / (stars[i].z*stars[i].z);
-    sdlAux->putPixel(u, v, color);
-  }
+  task3();
 
   sdlAux->render();
 }
 
-void update() {
+void update()
+{
+  trailLengthNow++;
   int t2 = SDL_GetTicks();
   float dt = float(t2 - t);
   t = t2;
@@ -129,6 +115,72 @@ void update() {
     if (stars[i].z <= 0)
     {
       stars[i].z += 1;
+    }
+  }
+
+  if (trailLengthNow > trailLengthMax)
+  {
+    for (int i = 0; i < endStars.size(); i++)
+    {
+      if (endStars[i].z <= 0)
+      {
+        endStars[i].z += 1;
+      }
+      endStars[i].z = endStars[i].z - 0.0001 * dt;
+      if (endStars[i].z <= 0)
+      {
+        endStars[i].z += 1;
+      }
+    } 
+  }
+}
+
+void task2()
+{
+  vector<vec3> left_side(SCREEN_HEIGHT);
+  vector<vec3> right_side(SCREEN_HEIGHT);
+  interpolate(topLeft, bottomLeft, left_side);
+  interpolate(topRight, bottomRight, right_side);
+
+  for (int y = 0; y < SCREEN_HEIGHT; ++y)
+  {
+    vector<vec3> row(SCREEN_WIDTH);
+    interpolate(left_side[y], right_side[y], row);
+    for (int x = 0; x < SCREEN_WIDTH; ++x)
+    {
+      sdlAux->putPixel(x, y, row[x]);
+    }
+  }
+}
+
+void task3()
+{
+  float f = SCREEN_HEIGHT / 2;
+
+  for (size_t i = 0; i < stars.size(); i++)
+  {
+    // calculate u for this star from f
+    float u = f * stars[i].x / stars[i].z + SCREEN_WIDTH / 2;
+    // calculate v for this star from f
+    float v = f * stars[i].y / stars[i].z + SCREEN_HEIGHT / 2;
+    vec3 color = 0.2f * vec3(1, 1, 1) / (stars[i].z * stars[i].z);
+    sdlAux->putPixel(u, v, color);
+    if (trailLengthNow > trailLengthMax)
+    {
+      // calculate u for this star from f
+      float u2 = f * endStars[i].x / endStars[i].z + SCREEN_WIDTH / 2;
+      // calculate v for this star from f
+      float v2 = f * endStars[i].y / endStars[i].z + SCREEN_HEIGHT / 2;
+      vec3 trailColor(0.0, 0.0, 0.0);
+      sdlAux->putPixel(u2, v2, trailColor);
+      // also draw ajacent pixels
+      for (int j = -3; j <= 3; j++)
+      {
+        for (int k = -3; k <= 3; k++)
+        {
+          sdlAux->putPixel(u2 + j, v2 + k, trailColor);
+        }
+      }
     }
   }
 }

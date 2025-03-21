@@ -18,8 +18,8 @@ using glm::vec3;
 
 // ---------------------------------------------------------
 // GLOBAL VARIABLES
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1080;
+const int SCREEN_HEIGHT = 720;
 SDL2Aux *sdlAux;
 
 vec3 topLeft(1, 0, 0);     // red
@@ -30,6 +30,8 @@ vec3 bottomRight(1, 1, 0); // yellow
 // Starfield
 vector<vec3> stars(1000);
 
+int t;
+
 // ---------------------------------------------------------
 // FUNCTION DECLARATIONS
 void draw();
@@ -37,6 +39,7 @@ void interpolate(float a, float b, vector<float> &result);
 void interpolate(vec3 a, vec3 b, vector<vec3> &result);
 void interpolate_test_1();
 void interpolate_test_2();
+void update();
 // ---------------------------------------------------------
 
 // FUNCTION DEFINITIONS
@@ -61,8 +64,11 @@ int main(int argc, char *argv[])
     }
   }
 
+  t = SDL_GetTicks();
+
   while (!sdlAux->quitEvent())
   {
+    update();
     draw();
   }
   sdlAux->saveBMP("screenshot.bmp");
@@ -96,16 +102,35 @@ void draw()
 
   float f = SCREEN_HEIGHT / 2;
 
-  for (size_t i = 0; i < stars.size(); i++) {
+  for (size_t i = 0; i < stars.size(); i++)
+  {
     // calculate u for this star from f
     float u = f * stars[i].x / stars[i].z + SCREEN_WIDTH / 2;
     // calculate v for this star from f
     float v = f * stars[i].y / stars[i].z + SCREEN_HEIGHT / 2;
-    vec3 color(1.0, 1.0, 1.0);
+    vec3 color = 0.2f * vec3(1,1,1) / (stars[i].z*stars[i].z);
     sdlAux->putPixel(u, v, color);
-    }
+  }
 
   sdlAux->render();
+}
+
+void update() {
+  int t2 = SDL_GetTicks();
+  float dt = float(t2 - t);
+  t = t2;
+  for (int i = 0; i < stars.size(); i++)
+  {
+    if (stars[i].z <= 0)
+    {
+      stars[i].z += 1;
+    }
+    stars[i].z = stars[i].z - 0.0001 * dt;
+    if (stars[i].z <= 0)
+    {
+      stars[i].z += 1;
+    }
+  }
 }
 
 void interpolate(float a, float b, vector<float> &result)

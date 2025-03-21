@@ -27,6 +27,9 @@ vec3 topRight(0, 0, 1);    // blue
 vec3 bottomLeft(0, 1, 0);  // green
 vec3 bottomRight(1, 1, 0); // yellow
 
+// Starfield
+vector<vec3> stars(1000);
+
 // ---------------------------------------------------------
 // FUNCTION DECLARATIONS
 void draw();
@@ -39,7 +42,25 @@ void interpolate_test_2();
 // FUNCTION DEFINITIONS
 int main(int argc, char *argv[])
 {
+  // Initialize stars
+  for (int i = 0; i < stars.size(); ++i)
+  {
+    stars[i].x = float(rand()) / float(RAND_MAX) * 2.0f - 1.0f;
+    stars[i].y = float(rand()) / float(RAND_MAX) * 2.0f - 1.0f;
+    stars[i].z = float(rand()) / float(RAND_MAX);
+  }
+
   sdlAux = new SDL2Aux(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  for (int y = 0; y < SCREEN_HEIGHT; ++y)
+  {
+    for (int x = 0; x < SCREEN_WIDTH; ++x)
+    {
+      vec3 color(0.0, 0.0, 0.0);
+      sdlAux->putPixel(x, y, color);
+    }
+  }
+
   while (!sdlAux->quitEvent())
   {
     draw();
@@ -54,20 +75,35 @@ void draw()
 {
   sdlAux->clearPixels();
 
-  vector<vec3> left_side(SCREEN_HEIGHT);
-  vector<vec3> right_side(SCREEN_HEIGHT);
-  interpolate(topLeft, bottomLeft, left_side);
-  interpolate(topRight, bottomRight, right_side);
+  // Lab1 task2
 
-  for (int y = 0; y < SCREEN_HEIGHT; ++y)
-  {
-    vector<vec3> row(SCREEN_WIDTH);
-    interpolate(left_side[y], right_side[y], row);
-    for (int x = 0; x < SCREEN_WIDTH; ++x)
-    {
-      sdlAux->putPixel(x, y, row[x]);
+  // vector<vec3> left_side(SCREEN_HEIGHT);
+  // vector<vec3> right_side(SCREEN_HEIGHT);
+  // interpolate(topLeft, bottomLeft, left_side);
+  // interpolate(topRight, bottomRight, right_side);
+
+  // for (int y = 0; y < SCREEN_HEIGHT; ++y)
+  // {
+  //   vector<vec3> row(SCREEN_WIDTH);
+  //   interpolate(left_side[y], right_side[y], row);
+  //   for (int x = 0; x < SCREEN_WIDTH; ++x)
+  //   {
+  //     sdlAux->putPixel(x, y, row[x]);
+  //   }
+  // }
+
+  // Lab1 task3
+
+  float f = SCREEN_HEIGHT / 2;
+
+  for (size_t i = 0; i < stars.size(); i++) {
+    // calculate u for this star from f
+    float u = f * stars[i].x / stars[i].z + SCREEN_WIDTH / 2;
+    // calculate v for this star from f
+    float v = f * stars[i].y / stars[i].z + SCREEN_HEIGHT / 2;
+    vec3 color(1.0, 1.0, 1.0);
+    sdlAux->putPixel(u, v, color);
     }
-  }
 
   sdlAux->render();
 }

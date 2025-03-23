@@ -163,7 +163,13 @@ void task3()
     float u = f * stars[i].x / stars[i].z + SCREEN_WIDTH / 2;
     // calculate v for this star from f
     float v = f * stars[i].y / stars[i].z + SCREEN_HEIGHT / 2;
-    vec3 color = 0.2f * vec3(1, 1, 1) / (stars[i].z * stars[i].z);
+    // Generate a random color based on star position and time
+    vec3 color = 0.2f * vec3(
+      0.5f + 0.5f * sin(stars[i].x * 5.0f + t * 0.001f),
+      0.5f + 0.5f * sin(stars[i].y * 5.0f + t * 0.002f),
+      0.5f + 0.5f * sin(stars[i].z * 5.0f + t * 0.003f)
+    ) / (stars[i].z * stars[i].z);
+
     sdlAux->putPixel(u, v, color);
     if (trailLengthNow > trailLengthMax)
     {
@@ -173,7 +179,7 @@ void task3()
       float v2 = f * endStars[i].y / endStars[i].z + SCREEN_HEIGHT / 2;
       vec3 trailColor(0.0, 0.0, 0.0);
       sdlAux->putPixel(u2, v2, trailColor);
-      // also draw ajacent pixels
+      // also draw adjacent pixels
       for (int j = -3; j <= 3; j++)
       {
         for (int k = -3; k <= 3; k++)

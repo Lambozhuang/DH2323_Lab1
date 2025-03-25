@@ -102,6 +102,8 @@ void draw()
 void update()
 {
   trailLengthNow++;
+
+  // move the stars
   int t2 = SDL_GetTicks();
   float dt = float(t2 - t);
   t = t2;
@@ -111,13 +113,10 @@ void update()
     {
       stars[i].z += 1;
     }
-    stars[i].z = stars[i].z - 0.0001 * dt;
-    if (stars[i].z <= 0)
-    {
-      stars[i].z += 1;
-    }
+    stars[i].z = stars[i].z - 0.0001 * dt; 
   }
 
+  // move the trails
   if (trailLengthNow > trailLengthMax)
   {
     for (int i = 0; i < endStars.size(); i++)
@@ -127,10 +126,6 @@ void update()
         endStars[i].z += 1;
       }
       endStars[i].z = endStars[i].z - 0.0001 * dt;
-      if (endStars[i].z <= 0)
-      {
-        endStars[i].z += 1;
-      }
     } 
   }
 }

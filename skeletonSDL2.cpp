@@ -188,10 +188,10 @@ void task3()
 
 void interpolate(float a, float b, vector<float> &result)
 {
-  int steps = result.size();
+  int steps = result.size() - 1;
   if (steps == 0)
     return;
-  float step = (b - a) / (steps - 1);
+  float step = (b - a) / steps;
   for (int i = 0; i < steps; ++i)
   {
     result[i] = a + step * i;
@@ -200,10 +200,10 @@ void interpolate(float a, float b, vector<float> &result)
 
 void interpolate(vec3 a, vec3 b, vector<vec3> &result)
 {
-  int steps = result.size();
+  int steps = result.size() - 1;
   if (steps == 0)
     return;
-  vec3 step = (b - a) / (float)(steps - 1);
+  vec3 step = (b - a) / (float)steps;
   for (int i = 0; i < steps; ++i)
   {
     result[i] = a + step * (float)i;
